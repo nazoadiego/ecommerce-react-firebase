@@ -1,10 +1,7 @@
-import { Link } from "react-router-dom";
-
 const Homepage = () => {
 	return (
 		<div>
-			<h2>Homepage</h2>
-			<Link to="/registration">Register</Link>
+			<h2>This is the home page</h2>
 		</div>
 	);
 };
