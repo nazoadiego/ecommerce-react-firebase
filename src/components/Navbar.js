@@ -6,7 +6,7 @@ const Navbar = (props) => {
 
 	return (
 		<nav className="bg-red-400 p-2 text-white flex justify-between">
-			<h2>Navbar</h2>
+			<h2>Grupo M2</h2>
 
 			{currentUser && (
 				<ul className="inline-flex items-center space-x-6">

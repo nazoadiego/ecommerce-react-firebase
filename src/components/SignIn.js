@@ -1,8 +1,10 @@
 import { Component } from "react";
+import { Link } from "react-router-dom";
 import { signInWithGoogle, auth } from "./../firebase/utils";
 // Components
 import Button from "./forms/Button";
 import FormInput from "./forms/FormInput";
+import AuthWrapper from "./forms/AuthWrapper";
 
 const initialState = {
 	email: "",
@@ -42,12 +44,10 @@ class SignIn extends Component {
 
 	render() {
 		const { email, password } = this.state;
+		const configAuthWrapper = { headline: "Log In" };
 
 		return (
-			<div>
-				<div>
-					<h2>Log In form</h2>
-				</div>
+			<AuthWrapper {...configAuthWrapper}>
 				<div>
 					<form onSubmit={this.handleSubmit}>
 						<FormInput
@@ -66,9 +66,11 @@ class SignIn extends Component {
 						/>
 						<Button type="submit">Log in</Button>
 						<Button onClick={signInWithGoogle}>Sign in with Google</Button>
+
+						<Link to="/recovery">Reset password</Link>
 					</form>
 				</div>
-			</div>
+			</AuthWrapper>
 		);
 	}
 }
