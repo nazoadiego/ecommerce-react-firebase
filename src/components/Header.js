@@ -1,7 +1,8 @@
+import { connect } from "react-redux";
 import { Link } from "react-router-dom";
 import { auth } from "./../firebase/utils";
 
-const Navbar = (props) => {
+const Header = (props) => {
 	const { currentUser } = props;
 
 	return (
@@ -12,6 +13,9 @@ const Navbar = (props) => {
 				<ul className="inline-flex items-center space-x-6">
 					<li>
 						<Link to="/">Home</Link>
+					</li>
+					<li>
+						<Link to="/">Dashboard</Link>
 					</li>
 					<li>
 						<span onClick={() => auth.signOut()}>Log Out</span>
@@ -36,8 +40,12 @@ const Navbar = (props) => {
 	);
 };
 
-Navbar.defaultProps = {
+Header.defaultProps = {
 	currentUser: null,
 };
 
-export default Navbar;
+const mapStateToProps = ({ user }) => ({
+	currentUser: user.currentUser,
+});
+
+export default connect(mapStateToProps, null)(Header);

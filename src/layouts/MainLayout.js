@@ -1,10 +1,10 @@
-import Navbar from "./../components/Navbar";
+import Header from "./../components/Header";
 import Footer from "./../components/Footer";
 
 const MainLayout = (props) => {
 	return (
 		<>
-			<Navbar {...props} />
+			<Header {...props} />
 			<main className="min-h-screen">{props.children}</main>
 			<Footer />
 		</>

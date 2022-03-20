@@ -1,7 +1,9 @@
-// Packages
-import { Component } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import { auth, handleUserProfile } from "./firebase/utils";
+import { setCurrentUser } from "./redux/User/user.actions";
+import { connect } from "react-redux";
+import { useEffect } from "react";
+
 // Styles
 import "./stylesheets/index.css";
 import "./stylesheets/application.scss";
@@ -12,99 +14,102 @@ import Homepage from "./pages/Homepage";
 import Registration from "./pages/Registration";
 import Login from "./pages/Login";
 import Recovery from "./pages/Recovery";
+import Dashboard from "./pages/Dashboard";
 
-const initialState = {
-	currentUser: null,
-};
+const App = (props) => {
+	const { setCurrentUser, currentUser } = props;
 
-class App extends Component {
-	constructor(props) {
-		super(props);
-		this.state = {
-			...initialState,
-		};
-	}
-
-	authListener = null;
-
-	componentDidMount() {
-		this.authListener = auth.onAuthStateChanged(async (userAuth) => {
+	useEffect(() => {
+		const authListener = auth.onAuthStateChanged(async (userAuth) => {
 			if (userAuth) {
 				const userRef = await handleUserProfile(userAuth);
 				userRef.onSnapshot((snapshot) => {
-					this.setState({
-						currentUser: {
-							id: snapshot.id,
-							...snapshot.data(),
-						},
+					setCurrentUser({
+						id: snapshot.id,
+						...snapshot.data(),
 					});
 				});
 			}
 
-			this.setState({
-				...initialState,
-			});
+			// if the user is not logged in, userAuth will return null anyway
+			setCurrentUser(userAuth);
 		});
-	}
 
-	componentWillUnmount() {
-		this.authListener();
-	}
+		return () => {
+			authListener();
+		};
+	}, [setCurrentUser]);
 
-	render() {
-		const { currentUser } = this.state;
-
-		return (
-			<div className="App">
-				<Routes>
-					<Route
-						path="/"
-						element={
-							<MainLayout currentUser={currentUser}>
-								<Homepage />
+	return (
+		<div className="App">
+			<Routes>
+				<Route
+					path="/"
+					element={
+						<MainLayout>
+							<Homepage />
+						</MainLayout>
+					}
+				></Route>
+				<Route
+					path="/register"
+					element={
+						currentUser ? (
+							<Navigate to="/" replace />
+						) : (
+							<MainLayout>
+								<Registration />
 							</MainLayout>
-						}
-					></Route>
-					<Route
-						path="/register"
-						element={
-							currentUser ? (
-								<Navigate to="/" replace />
-							) : (
-								<MainLayout currentUser={currentUser}>
-									<Registration />
-								</MainLayout>
-							)
-						}
-					></Route>
-					<Route
-						path="/login"
-						element={
-							currentUser ? (
-								<Navigate to="/" replace />
-							) : (
-								<MainLayout currentUser={currentUser}>
-									<Login />
-								</MainLayout>
-							)
-						}
-					></Route>
-					<Route
-						path="/recovery"
-						element={
-							currentUser ? (
-								<Navigate to="/" replace />
-							) : (
-								<MainLayout currentUser={currentUser}>
-									<Recovery />
-								</MainLayout>
-							)
-						}
-					></Route>
-				</Routes>
-			</div>
-		);
-	}
-}
+						)
+					}
+				></Route>
+				<Route
+					path="/login"
+					element={
+						currentUser ? (
+							<Navigate to="/" replace />
+						) : (
+							<MainLayout>
+								<Login />
+							</MainLayout>
+						)
+					}
+				></Route>
+				<Route
+					path="/recovery"
+					element={
+						currentUser ? (
+							<Navigate to="/" replace />
+						) : (
+							<MainLayout>
+								<Recovery />
+							</MainLayout>
+						)
+					}
+				></Route>
+				<Route
+					path="/dashboard"
+					element={
+						currentUser ? (
+							<Navigate to="/" replace />
+						) : (
+							<MainLayout>
+								<Dashboard />
+							</MainLayout>
+						)
+					}
+				></Route>
+			</Routes>
+		</div>
+	);
+};
 
-export default App;
+const mapStateToProps = ({ user }) => ({
+	currentUser: user.currentUser,
+});
+
+const mapDispatchToProps = (dispatch) => ({
+	setCurrentUser: (user) => dispatch(setCurrentUser(user)),
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(App);
